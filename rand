@@ -1,0 +1,62 @@
+root = new NLNode<>(f,null);
+        if(f.isDirectory())
+            recursive(root);
+    }
+
+    private void recursive(NLNode<FileObject> r) {
+        if (r.getData().isDirectory()) {
+            Iterator<FileObject> iterator = r.getData().directoryFiles();
+            while (iterator.hasNext()) {
+                FileObject childFileObject = iterator.next();
+                NLNode<FileObject> childNode = new NLNode<>(childFileObject);
+                r.addChild(childNode);
+                childNode.setParent(r);
+                recursive(childNode);
+            }
+        }
+    }
+
+
+
+    public Iterator<String> filesOfType(String type) {
+            ArrayList<String> filenames = new ArrayList<String>();
+            findFilesOfType(this.root, type, filenames);
+            return filenames.iterator();
+        }
+
+        private void findFilesOfType(NLNode<FileObject> node, String type, ArrayList<String> filenames) {
+            if (!node.getData().isDirectory() && node.getData().getName().endsWith(type)) {
+                filenames.add(node.getData().getLongName());
+            }
+
+
+            else if (node.getData().isDirectory()) {
+                Iterator<NLNode<FileObject>> iter = node.getChildren(null);
+                while (iter.hasNext()) {
+                    findFilesOfType(iter.next(), type, filenames);
+                }
+            }
+        }
+
+        public String findFile(String name) {
+            ArrayList<String> filenames = new ArrayList<String>();
+            findFilesWithName(this.root, name, filenames);
+            if (filenames.isEmpty()) {
+                return "";
+            } else {
+                return filenames.get(0);
+            }
+        }
+
+        private void findFilesWithName(NLNode<FileObject> node, String name, ArrayList<String> filenames) {
+            if (!node.getData().isDirectory() && node.getData().getName().equals(name)) {
+                filenames.add(node.getData().getLongName());
+            }
+
+            else if (node.getData().isDirectory()) {
+                Iterator<NLNode<FileObject>> iter = node.getChildren(null);
+                while (iter.hasNext()) {
+                    findFilesWithName(iter.next(), name, filenames);
+                }
+            }
+        }
